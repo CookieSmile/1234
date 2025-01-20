@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cube game</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <section class="game">
+        <section style="position: relative;">
+            <div class="gameEnd">
+                <h1>Game over</h1><button id="btnReplay">replay</button>
+            </div>
+            <canvas id="gameCanvas">
+
+            </canvas>
+        </section>
+        <section class="stats">
+            <div class="wrapper">
+                <h3 id="userStats">Пользователь: Katya </h3>
+                <h3 id="timeStats">Таймер: 120 сек </h3>
+                <h3 id="scoreCounter">Счетчик: 0 очков</h3>
+                <section class="hitPoint">
+                    <img src="./image.png" alt="hp1">
+                    <img src="./image.png" alt="hp2">
+                    <img src="./image.png" alt="hp3">
+                    <img src="./image.png" alt="hp4">
+                    <img src="./image.png" alt="hp5">
+                </section>
+            </div>
+            <section class="buttons">
+                <button id="btnStats">
+                    Stats
+                </button>
+                <button id="btnInfo">
+                    ЧАВО?
+                </button>
+                <button id="btnPlay">play</button>
+            </section>
+        </section>
+    </section>
+
+    <section class="game-hello">
+        <div>
+            <h3 class="title">
+                UlTRA MLG GAME ON THE WORLD
+            </h3>
+            <div class="userData">
+                <input type="text" name="" class="inpName" id="nameinp" placeholder="Введите имя">
+                <button id="start">Начать</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let user = '';
+        start.onclick = () => {
+            if (nameinp.value.trim() != '') {
+                document.querySelector(".game-hello").style.display = 'none';
+                document.querySelector(".game").style.display = 'flex';
+                user = nameinp.value;
+                userStats.textContent = `Пользователь: ${user}`;
+            } else {
+                nameinp.classList.add('error');
+                nameinp.placeholder = "вы не ввели имя"
+            }
+
+        }
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let hitPointNodes = document.querySelectorAll(".hitPoint img");
+        let scoreNode = document.getElementById('scoreStats')
+        let gameEndNode = document.querySelector('.gameEnd')
+        let score = 0;
+        let hit = 0;
+        let timer = 120;
+        let interval;
+        let gameStarted = false;
+        let curentCorner = 0;
+
+        // Параметры кубика
+        let cube = {
+            x: 50,
+            y: canvas.height - 50,
+            size: 10,
+            color: '#003',
+            velocityY: 0,
+            velocityX: 0,
+            isJumping: false,
+            speed: 5
+        };
+
+        let columns = generateColumns(cube, canvas.width, canvas.height, 10, 30, 30);
+        // Гравитация
+        const gravity = 0.5;
+
+        // Функция для отрисовки кубика
+        function drawCube() {
+            ctx.fillStyle = cube.color;
+            ctx.fillRect(cube.x, cube.y, cube.size, cube.size * 0.7);
+        }
+
+        // Функция прыжка
+        function jump(height, speed) {
+            if (!cube.isJumping) {
+                cube.isJumping = true;
+                cube.velocityY = -Math.sqrt(2 * gravity * height) * speed;
+            }
+            console.log('jump')
+        }
+
+
+        function reqframe() {
+            console.log(12);
+            requestAnimationFrame(reqframe);
+        }
+
+        // Главный цикл игры
+        function gameLoop() {
+            if (hit >= 5 || timer <= 0) {
+                gameEndNode.style.display = 'flex';
+                clearInterval(interval);
+                gameStarted = false
+                return
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Применение гравитации
+            cube.velocityY += gravity;
+            cube.y += cube.velocityY;
+            cube.x += cube.velocityX;
+
+            // Ограничение кубика по нижнему краю
+            if (cube.y + cube.size * 0.7 >= canvas.height) {
+                cube.y = canvas.height - cube.size * 0.7;
+                cube.isJumping = false;
+                cube.velocityY = 0;
+            }
+
+            // Ограничение по верхнему краю
+            if (cube.y < 0) {
+                cube.y = 0;
+                cube.velocityY = 0;
+            }
+
+            // Ограничение по бокам
+            if (cube.x < 0) {
+                cube.x = 0;
+                if (curentCorner == 0) {
+                    columns = generateColumns(cube, canvas.width, canvas.height, 10, 30, 30)
+                    score += 10;
+                    console.log('right')
+                    scoreCounter.textContent = `Счетчик: ${score} очков`;
+                }
+                curentCorner = 1
+            }
+            
+            if (cube.x + cube.size > canvas.width) {
+                cube.x = canvas.width - cube.size;
+                if (curentCorner == 1) {
+                    columns = generateColumns(cube, canvas.width, canvas.height, 10, 30, 30)
+                    score += 10;
+                    scoreCounter.textContent = `Счетчик: ${score} очков`;
+                }
+                curentCorner = 0;
+            }
+
+            drawCube();
+            drawColumns(columns);
+            handleCollision(cube, columns, canvas.width, canvas.height, 10, 30, 30);
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case 'Space': // Прыжок
+                    jump(50, 1); // Высота 100px, скорость 1
+                    break;
+                case 'KeyA': // Движение влево
+                    cube.velocityX = -cube.speed;
+                    break;
+                case 'KeyD': // Движение вправо
+                    cube.velocityX = cube.speed;
+                    break;
+            }
+        });
+
+        // Обработка отпускания клавиш
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyA' || e.code === 'KeyD') {
+                cube.velocityX = 0; // Остановка движения
+            }
+        });
+
+
+        function generateColumns(cube, canvasWidth, canvasHeight, columnWidth, columnHeight, minDistance) {
+            const columns = [];
+
+            while (columns.length < 2) {
+                // Генерация случайных координат для столбца
+                const x = Math.random() * (canvasWidth - 4 * columnWidth) + 20; // Убираем появление рядом с краями
+
+                const y = canvasHeight - columnHeight;
+
+                // Проверка на минимальную дистанцию от кубика
+                const distanceToCube = Math.sqrt((cube.x - x) ** 2 + (cube.y - y) ** 2);
+                if (distanceToCube >= minDistance) {
+                    columns.push({ x, y, width: columnWidth, height: columnHeight });
+                }
+            }
+
+            return columns;
+        }
+
+        function drawColumns(columns) {
+            // Отрисовка столбцов на canvas
+            columns.forEach(column => {
+                ctx.fillStyle = 'red';
+                ctx.fillRect(column.x, column.y, column.width, column.height);
+            });
+        }
+
+        function isColliding(rect1, rect2) {
+            return (
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.size > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.size > rect2.y
+            );
+        }
+
+        // Функция для обработки пересечений
+        function handleCollision(cube, columns, canvasWidth, canvasHeight, columnWidth, columnHeight, minDistance) {
+            columns.forEach((column, index) => {
+                if (isColliding(cube, column)) {
+                    hitPointNodes[hit].remove();
+                    hit += 1;
+                    // Генерируем новую колонну взамен пересечённой
+                    const newColumn = generateColumns(
+                        cube, canvasWidth, canvasHeight, columnWidth, columnHeight, minDistance
+                    )[0]; // Получаем одну колонну
+                    // Заменяем старую колонну на новую
+                    columns[index] = newColumn;
+                }
+            });
+        }
+
+        btnPlay.onclick = () => {
+            if (gameStarted) {
+                return
+            }
+            gameLoop();
+            interval = setInterval(() => {
+                timer -= 1;
+                timeStats.textContent = `Таймер: ${timer} сек`
+            }, 1000);
+            gameStarted = true;
+        }
+
+        btnReplay.onclick = () => {
+            if (gameStarted) {
+                return
+            }
+
+            score = 0;  // обнуление статистики
+            hit = 0;
+            timer = 120;
+            interval;
+            gameStarted = false;
+            curentCorner = 0;
+
+            scoreCounter.textContent = `Счетчик: ${score} очков`;
+
+            for (let i = 0; i < 5; i++) {
+                document.querySelector(".hitPoint").appendChild(document.createElement('img')).src = './image.png'
+            }
+
+            hitPointNodes = document.querySelectorAll(".hitPoint img");
+
+            gameLoop();
+            interval = setInterval(() => { // создание нового счетчика
+                timer -= 1;
+                timeStats.textContent = `Таймер: ${timer} сек`
+            }, 1000);
+
+            gameStarted = true;
+            gameEndNode.style.display = 'none';
+        }
+
+        btnStats.onclick = ()=>{
+            statsTable.sytle.display = 'flex'
+        }
+        
+        
+    </script>
+</body>
+
+</html>

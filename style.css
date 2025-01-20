@@ -1,0 +1,152 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: calibri;
+}
+html {
+  background-color: #002;
+}
+.game{
+  box-shadow: 0 0 100px rgba(34, 152, 236, 0.246);
+}
+.game-hello {
+  padding: 1rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 1rem;
+  background-color: #eaeaea;
+  color: #002;
+  width: 300px;
+  height: 200px;
+}
+.title {
+  text-align: center;
+}
+.inpName {
+  background-color: transparent;
+  padding: 0.5rem;
+  color: #002;
+  border: 2px solid #002;
+  border-radius: 0.5rem;
+  width: 100%;
+}
+.error::-webkit-input-placeholder {
+  color: red;
+}
+
+.userData {
+  margin-top: 2rem;
+  width: 100%;
+  & button {
+    margin-top: 1rem;
+    background-color: transparent;
+    padding: 0.5rem;
+    color: #002;
+    border: 2px solid #002;
+    border-radius: 0.5rem;
+    width: 100%;
+    transition: 500ms;
+    cursor: pointer;
+  }
+  & button:hover {
+    background-color: #002;
+    color: white;
+  }
+}
+.hitPoint{
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 10px;
+  & img {
+    height: 30px;
+  }
+}
+.game {
+  display: none; /* поменять  */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 1rem;
+  background-color: #eaeaea;
+  padding: 2rem;
+  justify-content: center;
+  gap: 15px;
+  .wrapper {
+    width: 200px;
+  }
+}
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  & button {
+    margin-top: 1rem;
+    background-color: transparent;
+    padding: 0.5rem;
+    color: #002;
+    border: 2px solid #002;
+    border-radius: 0.5rem;
+    width: 100%;
+    transition: 500ms;
+    cursor: pointer;
+  }
+  & button:hover {
+    background-color: #002;
+    color: white;
+  }
+  .buttons{
+      width: 100%;
+  }
+}
+canvas {
+  position: relative;
+  border: 2px solid #002;
+  width: 500px;
+  height: 400px;
+}
+
+.gameEnd{
+  border-radius: 1rem;
+  position: absolute;
+  backdrop-filter: blur(5px);
+  background: linear-gradient(
+    45deg,
+    #6c53db49,
+    rgba(81, 123, 195, 0.379),
+    #7b00ff40
+  );
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 95%;
+  height: 95%;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #116;
+  font-size: 40px;
+  flex-direction: column;
+  gap: 15px;
+  & button {
+    margin-top: 1rem;
+    background-color: transparent;
+    padding: 0.5rem;
+    color: #002;
+    border: 2px solid #002;
+    border-radius: 0.5rem;
+    width: 50%;
+    transition: 500ms;
+    cursor: pointer;
+  }
+  & button:hover {
+    background-color: #002;
+    color: white;
+  }
+}
